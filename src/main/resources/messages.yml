@@ -1,0 +1,97 @@
+error-create:
+  - "[message] &#FFB400⎪&r &fнедостаточно средств для создания клана"
+error-clan-name:
+  - "[message] &#FFB400⎪&r Это название клана уже занято попробуйте другое"
+error-tag:
+  - "[message] &#FFB400⎪&r Достигнут лимит по названию клана допустимо 15 символов"
+error-name-block:
+  - "[message] &#FFB400⎪&r Создавать клан с таким названием нельзя"
+successfully-create:
+  - "[message] &#FFB400⎪&r &fКлан %clan_tag% успешно создан"
+no-clan-help:
+  - "[message] &#FFB400⎪&r &f/clan create [название] &7- &x&F&F&E&E&0&0Создать - клан"
+  - "[message] &#FFB400⎪&r &f/clan accept [ник] &7- &x&F&F&E&E&0&0Принять - приглашение в клан"
+new-invite:
+  - "[message] &#FFB400⎪&r &fВам поступило приглашение в клан %clan_tag% от &aлидера &fклана"
+  - "[message] &#FFB400⎪&r для принятия приглашения используйте /clan accept [ник]"
+owner-clan-invite:
+  - "[message] &#FFB400⎪&r Приглашение игроку успешно отправлено"
+player-accept-clan:
+  - "[message] &#FFB400⎪&r Игрок принял приглашение в клан"
+error-invite:
+  - "[message] &#FFB400⎪&r &fПриглашать в клан может только владелец клана"
+error-accept:
+  - "[message] &#FFB400⎪&r &f вас нет приглашения от данного игрока"
+successfully-accept:
+  - "[message] &#FFB400⎪&r &fПриглашение успешно принято"
+clan-help:
+  - "[message] &#FFB400⎪&r &fпомощь по кланам"
+  - ""
+  - "[message] &#FFB400⎪&r /clan help &7- &x&F&F&E&E&0&0Показать эту строку"
+  - "[message] &#FFB400⎪&r /clan invite [ник] &7- &x&F&F&E&E&0&0Пригласить - в клан"
+  - "[message] &#FFB400⎪&r /clan disband &7- &x&F&F&E&E&0&0Удалить клан"
+  - "[message] &#FFB400⎪&r /clan leave &7- &x&F&F&E&E&0&0Покинуть клан"
+  - "[message] &#FFB400⎪&r /clan kick <ник> &x&F&F&E&E&0&0Выгнать игрока с клана "
+  - "[message] &#FFB400⎪&r /clan chest &7- &x&F&F&E&E&0&0Открыть клановое хранилище"
+  - "[message] &#FFB400⎪&r /clan chat [сообщение] &7- &x&F&F&E&E&0&0Отправить сообщение в клановый чат"
+  - "[message] &#FFB400⎪&r /clan sethome &7- &x&F&F&E&E&0&0Установить точку кланового дома"
+  - "[message] &#FFB400⎪&r /clan home &7- &x&F&F&E&E&0&0Телепортироваться в клановый дом"
+  - "[message] &#FFB400⎪&r /clan stats &7- &x&F&F&E&E&0&0Клановая статистика"
+  - "[message] &#FFB400⎪&r /clan invest <сумма> &x&F&F&E&E&0&0Положить деньги на счет клана"
+  - "[message] &#FFB400⎪&r /clan withdraw <сумма> &x&F&F&E&E&0&0Снять деньги с кланового счета"
+successfully-disband:
+  - "[message] &#FFB400⎪&r &fВы успешно удалили клан %clan_tag%"
+error-disband:
+  - "[message] &#FFB400⎪&r &fУдалить клан может только владелец"
+error-owner-leave:
+  - "[message] &#FFB400⎪&r &fВы можете только удалить клан"
+successfully-leave:
+  - "[message] &#FFB400⎪&r &fВы успешно покинули клан"
+error-no-clan:
+  - "[message] &#FFB400⎪&r &f У вас нет клана"
+error-sethome:
+  - "[message] &#FFB400⎪&r У вас недостаточно средств чтобы установить точку кланового дома"
+error-sethome-member:
+  - "[message] &#FFB400⎪&r Установить клановый дом может только лидер клана"
+successfully-sethome:
+  - "[message] &#FFB400⎪&r Точка клановой базы установлена"
+teleport-home:
+  - "[message] &#FFB400⎪&r Вы успешно были телепортированы на клановый дом"
+clan-stats:
+  - "[message] &#FFB400⎪&r Название: &7%clan_tag%"
+  - "[message] &#FFB400⎪&r Владелец клана: %clan_owner%"
+  - "[message] &#FFB400⎪&r Участников: %clan_member_list%"
+  - "[message] &#FFB400⎪&r Убийств: &7%clan_kill%"
+  - "[message] &#FFB400⎪&r Баланс клана: %clan_balance%"
+error-chest-upgrade:
+  - "[message] &#FFB400⎪&r У вас недостаточно осколков"
+successfully-chest-upgrade:
+  - "[message] &#FFB400⎪&r Вы успешно улучшили клановое хранилище"
+clan-chat:
+  - "[message] &6Клановый чат: &f %player_name% %clan_message%"
+chat-successfully:
+  - "[message] &#FFB400⎪&r сообщение в клан чат отправлено"
+successfully-member-kick:
+  - "[message] &#FFB400⎪&r Вы успешно кикнули участника с клана"
+clan-kick-player:
+  - "[message] &#FFB400⎪&r Вы были выгнаны с клана %clan_tag%"
+error-kick-member:
+  - "[message] &#FFB400⎪&r Выгонять с клана может только владелец"
+error-kick-owner:
+  - "[message] &#FFB400⎪&r Вы не можете кинуть самого себя вы владелец клана"
+successfully-invest:
+  - "[message] &#FFB400⎪&r Вы успешно пополнили счет клана"
+error-invest:
+  - "[message] &#FFB400⎪&r Недостаточно средств для пополнения кланового счета"
+successfully-withdraw:
+  - "[message] &#FFB400⎪&r Вы успешно сняли деньги с кланового счета"
+error-withdraw:
+  - "[message] &#FFB400⎪&r Счет клана пуст.."
+error-member-withdraw:
+  - "[message] &#FFB400⎪&r Снимать деньги с кланового счета может только владелец"
+error-limit-withdraw:
+  - "[message] &#FFB400⎪&r Достигнут лимит снятия денег со счета клана"
+reload-use:
+  - "[message] &#FFB400⎪&r перезагрузка - /clan reload"
+plugin-reload:
+  - "[message] &#FFB400⎪&r Плагин перезагружен все работает исправно"

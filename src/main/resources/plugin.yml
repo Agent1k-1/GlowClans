@@ -1,0 +1,13 @@
+name: GlowClans
+version: '${project.version}'
+main: com.agent1k.GlowClans
+api-version: '1.16'
+depend: [ Vault ]
+softdepend: [ PlaceholderAPI, PlayerPoints ]
+libraries:
+  - org.xerial:sqlite-jdbc:3.44.0.0
+commands:
+  clan:
+permissions:
+  clan.reload:
+    default: op
