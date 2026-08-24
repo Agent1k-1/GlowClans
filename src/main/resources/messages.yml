@@ -11,6 +11,7 @@ successfully-create:
 no-clan-help:
   - "[message] &#FFB400⎪&r &f/clan create [название] &7- &x&F&F&E&E&0&0Создать - клан"
   - "[message] &#FFB400⎪&r &f/clan accept [ник] &7- &x&F&F&E&E&0&0Принять - приглашение в клан"
+  - "[message] &#FFB400⎪&r &f/clan cancel &7- &x&F&F&E&E&0&0Отклонить - приглашение в клан"
 new-invite:
   - "[message] &#FFB400⎪&r &fВам поступило приглашение в клан %clan_tag% от &aлидера &fклана"
   - "[message] &#FFB400⎪&r для принятия приглашения используйте /clan accept [ник]"
@@ -22,6 +23,12 @@ error-invite:
   - "[message] &#FFB400⎪&r &fПриглашать в клан может только владелец клана"
 error-accept:
   - "[message] &#FFB400⎪&r &f вас нет приглашения от данного игрока"
+successfully-cancel:
+  - "[message] &#FFB400⎪&r &fПриглашение в клан отклонено"
+owner-clan-cancel:
+  - "[message] &#FFB400⎪&r &fИгрок отклонить приглашение в клан"
+error-cancel-clan:
+  - "[message] &#FFB400⎪&r &fВам еще не поступало приглашение в клан для отклонения"
 successfully-accept:
   - "[message] &#FFB400⎪&r &fПриглашение успешно принято"
 clan-help:

@@ -1,5 +1,6 @@
 package com.agent1k.commands.tab;
 
+import com.agent1k.GlowClans;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,12 +15,16 @@ import java.util.stream.Collectors;
 
 public class ClanCompleter implements TabCompleter {
 
-    private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "create", "invite", "accept", "disband", "leave", "help", "storage", "chat",
-            "sethome", "home", "stats", "kick", "invest", "withdraw", "reload", "menu"
+    private static final List<String> NO_CLAN_SUBCOMMANDS = Arrays.asList(
+            "create", "accept", "cancel"
     );
 
-    private static final List<String> PLAYER_ARG_SUBCOMMANDS = Arrays.asList("invite", "accept", "kick");
+    private static final List<String> CLAN_SUBCOMMANDS = Arrays.asList(
+            "help", "invite", "disband", "leave", "kick", "storage", "menu",
+            "chat", "sethome", "home", "stats", "invest", "withdraw", "reload"
+    );
+
+    private static final List<String> PLAYER_ARG_SUBCOMMANDS = Arrays.asList("invite", "accept", "cancel", "kick");
 
     private static final List<String> AMOUNT_SUGGESTIONS = Arrays.asList(
             "15", "100", "500", "1000", "5000", "10000", "50000", "100000", "500000", "900000"
@@ -29,16 +34,29 @@ public class ClanCompleter implements TabCompleter {
     private static final String AMOUNT_PLACEHOLDER = "<введите сумму>";
     private static final String MESSAGE_PLACEHOLDER = "<сообщение>";
 
+    private final GlowClans plugin;
+
+    public ClanCompleter(@NotNull GlowClans plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                       @NotNull String alias, @NotNull String[] args) {
+        if (!(sender instanceof Player)) return Collections.emptyList();
+        Player player = (Player) sender;
+        boolean hasClan = plugin.getDataBase().hasClan(player.getUniqueId());
+        List<String> subs = hasClan ? CLAN_SUBCOMMANDS : NO_CLAN_SUBCOMMANDS;
+
         if (args.length == 1) {
-            return SUBCOMMANDS.stream()
-                    .filter(s -> s.startsWith(args[0].toLowerCase()))
+            String prefix = args[0].toLowerCase();
+            return subs.stream()
+                    .filter(s -> s.startsWith(prefix))
                     .collect(Collectors.toList());
         }
         if (args.length == 2) {
             String sub = args[0].toLowerCase();
+            if (!subs.contains(sub)) return Collections.emptyList();
             if (sub.equals("create")) {
                 return Collections.singletonList(CLAN_NAME_PLACEHOLDER);
             }

@@ -77,6 +77,7 @@ public final class GlowClans extends JavaPlugin {
         clanCommand.register(new CreateCMD(this));
         clanCommand.register(new InviteCMD(this));
         clanCommand.register(new AcceptCMD(this));
+        clanCommand.register(new CancelCMD(this));
         clanCommand.register(new DisbandCMD(this));
         clanCommand.register(new LeaveCMD(this));
         clanCommand.register(new HelpCMD(this));
@@ -92,7 +93,7 @@ public final class GlowClans extends JavaPlugin {
         clanCommand.register(new MenuCMD(this));
 
         getCommand("clan").setExecutor(clanCommand);
-        getCommand("clan").setTabCompleter(new ClanCompleter());
+        getCommand("clan").setTabCompleter(new ClanCompleter(this));
 
         getServer().getPluginManager().registerEvents(new ChestListener(this), this);
         getServer().getPluginManager().registerEvents(new KillListener(this), this);
