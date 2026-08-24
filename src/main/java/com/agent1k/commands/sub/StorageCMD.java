@@ -9,18 +9,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class ChestCMD implements subcommand {
+public class StorageCMD implements subcommand {
 
     private final GlowClans plugin;
 
-    public ChestCMD(@NotNull GlowClans plugin) {
+    public StorageCMD(@NotNull GlowClans plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public void execute(@NotNull Player player, @NotNull String[] args) {
         Optional<String> tagOpt = plugin.getDataBase().getClanTag(player.getUniqueId());
-        if (tagOpt.isEmpty()) {
+        if (!tagOpt.isPresent()) {
             ActionType.dispatchAll(player, plugin.getMessages().get("error-no-clan"));
             return;
         }
@@ -38,6 +38,6 @@ public class ChestCMD implements subcommand {
 
     @Override
     public @NotNull String getName() {
-        return "chest";
+        return "storage";
     }
 }

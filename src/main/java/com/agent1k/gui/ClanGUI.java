@@ -2,14 +2,15 @@ package com.agent1k.gui;
 
 import com.agent1k.GlowClans;
 import com.agent1k.gui.menu.MenuConfig;
+import com.agent1k.gui.menu.MenuHolder;
 import com.agent1k.gui.menu.MenuItem;
+import com.agent1k.gui.menu.MenuPanel;
 import com.agent1k.utils.HexUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -19,19 +20,6 @@ import java.util.List;
 
 public class ClanGUI {
 
-    public static class Holder implements InventoryHolder {
-        private Inventory inventory;
-
-        public void setInventory(@NotNull Inventory inventory) {
-            this.inventory = inventory;
-        }
-
-        @Override
-        public @NotNull Inventory getInventory() {
-            return inventory;
-        }
-    }
-
     private final GlowClans plugin;
 
     public ClanGUI(@NotNull GlowClans plugin) {
@@ -40,21 +28,27 @@ public class ClanGUI {
 
     public void open(@NotNull Player player) {
         MenuConfig cfg = plugin.getMenuConfig();
-        Holder holder = new Holder();
+        MenuHolder holder = new MenuHolder();
         Inventory inventory = Bukkit.createInventory(holder, cfg.getSize(), parse(player, cfg.getMenuName()));
         holder.setInventory(inventory);
 
-        ItemStack panel = buildItem(player, cfg.getPanelMaterial(), cfg.getPanelName(), cfg.getPanelLore());
         int size = cfg.getSize();
-        for (int slot : cfg.getPanelSlots()) {
-            if (slot >= 0 && slot < size) {
-                inventory.setItem(slot, panel.clone());
+
+        for (MenuPanel panel : cfg.getPanels()) {
+            ItemStack panelItem = buildItem(player, panel.getMaterial(), panel.getName(), panel.getLore());
+            for (int slot : panel.getSlots()) {
+                if (slot >= 0 && slot < size) {
+                    inventory.setItem(slot, panelItem.clone());
+                }
             }
         }
 
-        MenuItem info = cfg.getInfoItem();
-        if (info.getSlot() >= 0 && info.getSlot() < size) {
-            inventory.setItem(info.getSlot(), buildItem(player, info.getMaterial(), info.getName(), info.getLore()));
+        for (MenuItem item : cfg.getItems().values()) {
+            int slot = item.getSlot();
+            if (slot >= 0 && slot < size) {
+                inventory.setItem(slot, buildItem(player, item.getMaterial(), item.getName(), item.getLore()));
+                holder.putItem(slot, item);
+            }
         }
 
         player.openInventory(inventory);

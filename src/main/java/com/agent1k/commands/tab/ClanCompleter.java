@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class ClanCompleter implements TabCompleter {
 
     private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "create", "invite", "accept", "disband", "leave", "help", "chest", "chat",
+            "create", "invite", "accept", "disband", "leave", "help", "storage", "chat",
             "sethome", "home", "stats", "kick", "invest", "withdraw", "reload", "menu"
     );
 

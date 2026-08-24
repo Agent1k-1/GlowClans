@@ -9,7 +9,8 @@ public enum ActionType {
     MESSAGE("message", new MessageAction()),
     SOUND("sound", new SoundAction()),
     COMMAND("command", new CommandAction()),
-    CONSOLE("console", new ConsoleAction());
+    CONSOLE("console", new ConsoleAction()),
+    CLOSE("close", new CloseAction());
 
     private final String key;
     private final Action action;

@@ -15,6 +15,7 @@ import com.agent1k.gui.menu.MenuConfig;
 import com.agent1k.gui.menu.MenuDirectory;
 import com.agent1k.listener.ChestListener;
 import com.agent1k.listener.KillListener;
+import com.agent1k.listener.MenuListener;
 import com.agent1k.upgrade.ChestUpgrade;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -79,7 +80,7 @@ public final class GlowClans extends JavaPlugin {
         clanCommand.register(new DisbandCMD(this));
         clanCommand.register(new LeaveCMD(this));
         clanCommand.register(new HelpCMD(this));
-        clanCommand.register(new ChestCMD(this));
+        clanCommand.register(new StorageCMD(this));
         clanCommand.register(new ChatCMD(this));
         clanCommand.register(new SethomeCMD(this));
         clanCommand.register(new HomeCMD(this));
@@ -95,6 +96,7 @@ public final class GlowClans extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new ChestListener(this), this);
         getServer().getPluginManager().registerEvents(new KillListener(this), this);
+        getServer().getPluginManager().registerEvents(new MenuListener(), this);
 
         Bukkit.getConsoleSender().sendMessage(ASCII_LOGO);
         Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "Плагин: " + ChatColor.GREEN + "включён");
