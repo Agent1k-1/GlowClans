@@ -1,5 +1,7 @@
 package com.agent1k;
 
+import com.agent1k.api.GlowClansAPI;
+import com.agent1k.api.impl.GlowClansAPIImpl;
 import com.agent1k.depend.softdepend.PapiAPI;
 import com.agent1k.depend.softdepend.PointsAPI;
 import com.agent1k.depend.VaultAPI;
@@ -20,6 +22,7 @@ import com.agent1k.listener.MenuListener;
 import com.agent1k.upgrade.ChestUpgrade;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,6 +79,8 @@ public final class GlowClans extends JavaPlugin {
             new PapiAPI(this).register();
         }
 
+        getServer().getServicesManager().register(GlowClansAPI.class, new GlowClansAPIImpl(this), this, ServicePriority.Normal);
+
         ClanCommand clanCommand = new ClanCommand(this);
         clanCommand.register(new CreateCMD(this));
         clanCommand.register(new InviteCMD(this));
@@ -118,6 +123,7 @@ public final class GlowClans extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "Автор: " + ChatColor.AQUA + "Agent1k");
         Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "Telegram: " + ChatColor.LIGHT_PURPLE + "t.me/monstexd");
         Bukkit.getConsoleSender().sendMessage("");
+        getServer().getServicesManager().unregisterAll(this);
         if (sqLite != null) sqLite.close();
     }
 

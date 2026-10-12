@@ -1,7 +1,12 @@
 package com.agent1k.data;
 
 import com.agent1k.GlowClans;
+import com.agent1k.api.event.ClanCreateEvent;
+import com.agent1k.api.event.ClanDisbandEvent;
+import com.agent1k.api.event.ClanMemberJoinEvent;
+import com.agent1k.api.event.ClanMemberLeaveEvent;
 import com.agent1k.config.DbConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -161,6 +166,7 @@ public class Mysql {
         playerClanCache.put(owner, tag);
         killsCache.put(tag, 0);
         balanceCache.put(tag, 0.0);
+        Bukkit.getPluginManager().callEvent(new ClanCreateEvent(tag, owner));
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement clanStmt = connection.prepareStatement(
                     "INSERT INTO " + t("clans") + " (tag, owner) VALUES (?, ?)");
@@ -187,7 +193,8 @@ public class Mysql {
     }
 
     public @NotNull CompletableFuture<Void> deleteClan(@NotNull String tag) {
-        clanOwnerCache.remove(tag);
+        List<UUID> members = getMemberUuids(tag);
+        UUID owner = clanOwnerCache.remove(tag);
         playerClanCache.values().removeIf(t -> t.equals(tag));
         Inventory removedChest = chestCache.remove(tag);
         if (removedChest != null) chestToClanCache.remove(removedChest);
@@ -195,6 +202,9 @@ public class Mysql {
         killsCache.remove(tag);
         balanceCache.remove(tag);
         unlockedSlotsCache.remove(tag);
+        if (owner != null) {
+            Bukkit.getPluginManager().callEvent(new ClanDisbandEvent(tag, owner, members));
+        }
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + t("clans") + " WHERE tag = ?")) {
                 stmt.setString(1, tag);
@@ -207,6 +217,7 @@ public class Mysql {
 
     public @NotNull CompletableFuture<Void> addMember(@NotNull UUID player, @NotNull String tag) {
         playerClanCache.put(player, tag);
+        Bukkit.getPluginManager().callEvent(new ClanMemberJoinEvent(tag, player));
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
                     "INSERT INTO " + t("members") + " (player_uuid, clan_tag) VALUES (?, ?)")) {
@@ -220,7 +231,10 @@ public class Mysql {
     }
 
     public @NotNull CompletableFuture<Void> removeMember(@NotNull UUID player) {
-        playerClanCache.remove(player);
+        String previousTag = playerClanCache.remove(player);
+        if (previousTag != null) {
+            Bukkit.getPluginManager().callEvent(new ClanMemberLeaveEvent(previousTag, player));
+        }
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
                     "DELETE FROM " + t("members") + " WHERE player_uuid = ?")) {
@@ -401,6 +415,10 @@ public class Mysql {
             if (entry.getValue().equals(tag)) result.add(entry.getKey());
         }
         return result;
+    }
+
+    public @NotNull List<String> getClanTags() {
+        return new ArrayList<>(clanOwnerCache.keySet());
     }
 
     public @NotNull Optional<String> getClanTag(@NotNull UUID player) {
