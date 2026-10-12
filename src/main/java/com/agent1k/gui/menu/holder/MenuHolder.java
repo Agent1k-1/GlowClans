@@ -1,5 +1,6 @@
-package com.agent1k.gui.menu;
+package com.agent1k.gui.menu.holder;
 
+import com.agent1k.gui.menu.panel.item.MenuItem;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;

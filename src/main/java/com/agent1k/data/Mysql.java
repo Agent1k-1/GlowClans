@@ -1,6 +1,7 @@
 package com.agent1k.data;
 
 import com.agent1k.GlowClans;
+import com.agent1k.config.DbConfig;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -13,9 +14,10 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class DataBase {
+public class Mysql {
 
     private final GlowClans plugin;
+    private final String prefix;
     private Connection connection;
 
     private final Map<UUID, String> playerClanCache = new HashMap<>();
@@ -28,56 +30,64 @@ public class DataBase {
     private final Map<String, Double> balanceCache = new HashMap<>();
     private final Map<String, Integer> unlockedSlotsCache = new HashMap<>();
 
-    public DataBase(@NotNull GlowClans plugin) {
+    public Mysql(@NotNull GlowClans plugin) {
         this.plugin = plugin;
+        this.prefix = plugin.getDbConfig().getTablePrefix();
         connect();
         createTables();
         loadCache();
     }
 
+    private @NotNull String t(@NotNull String name) {
+        return prefix + name;
+    }
+
     private void connect() {
+        DbConfig cfg = plugin.getDbConfig();
+        String url = String.format(
+                "jdbc:mysql://%s:%d/%s?useSSL=%b&autoReconnect=true&characterEncoding=utf8&useUnicode=true",
+                cfg.getMysqlHost(), cfg.getMysqlPort(), cfg.getMysqlDatabase(), cfg.isMysqlUseSsl());
         try {
-            File dbFile = new File(plugin.getDataFolder(), "clan.db");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+            connection = DriverManager.getConnection(url, cfg.getMysqlUsername(), cfg.getMysqlPassword());
         } catch (SQLException e) {
-            plugin.getLogger().severe("Ошибка подключения к базе данных: " + e.getMessage());
+            plugin.getLogger().severe("Ошибка подключения к MySQL: " + e.getMessage());
         }
     }
 
     private void createTables() {
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS clans (" +
-                    "tag TEXT PRIMARY KEY," +
-                    "owner TEXT NOT NULL)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS members (" +
-                    "player_uuid TEXT NOT NULL," +
-                    "clan_tag TEXT NOT NULL," +
-                    "FOREIGN KEY(clan_tag) REFERENCES clans(tag) ON DELETE CASCADE)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS chest_items (" +
-                    "clan_tag TEXT PRIMARY KEY," +
-                    "items TEXT NOT NULL," +
-                    "FOREIGN KEY(clan_tag) REFERENCES clans(tag) ON DELETE CASCADE)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS clan_homes (" +
-                    "clan_tag TEXT PRIMARY KEY," +
-                    "world TEXT NOT NULL," +
-                    "x REAL NOT NULL," +
-                    "y REAL NOT NULL," +
-                    "z REAL NOT NULL," +
-                    "yaw REAL NOT NULL," +
-                    "pitch REAL NOT NULL," +
-                    "FOREIGN KEY(clan_tag) REFERENCES clans(tag) ON DELETE CASCADE)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS clan_kills (" +
-                    "clan_tag TEXT PRIMARY KEY," +
-                    "kills INTEGER NOT NULL DEFAULT 0," +
-                    "FOREIGN KEY(clan_tag) REFERENCES clans(tag) ON DELETE CASCADE)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS clan_balance (" +
-                    "clan_tag TEXT PRIMARY KEY," +
-                    "balance REAL NOT NULL DEFAULT 0," +
-                    "FOREIGN KEY(clan_tag) REFERENCES clans(tag) ON DELETE CASCADE)");
-            stmt.execute("CREATE TABLE IF NOT EXISTS clan_chest_slots (" +
-                    "clan_tag TEXT PRIMARY KEY," +
-                    "unlocked_slots INTEGER NOT NULL," +
-                    "FOREIGN KEY(clan_tag) REFERENCES clans(tag) ON DELETE CASCADE)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("clans") + " (" +
+                    "tag VARCHAR(64) PRIMARY KEY," +
+                    "owner VARCHAR(36) NOT NULL)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("members") + " (" +
+                    "player_uuid VARCHAR(36) NOT NULL," +
+                    "clan_tag VARCHAR(64) NOT NULL," +
+                    "FOREIGN KEY(clan_tag) REFERENCES " + t("clans") + "(tag) ON DELETE CASCADE)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("chest_items") + " (" +
+                    "clan_tag VARCHAR(64) PRIMARY KEY," +
+                    "items LONGTEXT NOT NULL," +
+                    "FOREIGN KEY(clan_tag) REFERENCES " + t("clans") + "(tag) ON DELETE CASCADE)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("clan_homes") + " (" +
+                    "clan_tag VARCHAR(64) PRIMARY KEY," +
+                    "world VARCHAR(255) NOT NULL," +
+                    "x DOUBLE NOT NULL," +
+                    "y DOUBLE NOT NULL," +
+                    "z DOUBLE NOT NULL," +
+                    "yaw DOUBLE NOT NULL," +
+                    "pitch DOUBLE NOT NULL," +
+                    "FOREIGN KEY(clan_tag) REFERENCES " + t("clans") + "(tag) ON DELETE CASCADE)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("clan_kills") + " (" +
+                    "clan_tag VARCHAR(64) PRIMARY KEY," +
+                    "kills INT NOT NULL DEFAULT 0," +
+                    "FOREIGN KEY(clan_tag) REFERENCES " + t("clans") + "(tag) ON DELETE CASCADE)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("clan_balance") + " (" +
+                    "clan_tag VARCHAR(64) PRIMARY KEY," +
+                    "balance DOUBLE NOT NULL DEFAULT 0," +
+                    "FOREIGN KEY(clan_tag) REFERENCES " + t("clans") + "(tag) ON DELETE CASCADE)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + t("clan_chest_slots") + " (" +
+                    "clan_tag VARCHAR(64) PRIMARY KEY," +
+                    "unlocked_slots INT NOT NULL," +
+                    "FOREIGN KEY(clan_tag) REFERENCES " + t("clans") + "(tag) ON DELETE CASCADE)");
         } catch (SQLException e) {
             plugin.getLogger().severe("Ошибка создания таблиц: " + e.getMessage());
         }
@@ -85,19 +95,19 @@ public class DataBase {
 
     private void loadCache() {
         try (Statement stmt = connection.createStatement()) {
-            ResultSet clans = stmt.executeQuery("SELECT tag, owner FROM clans");
+            ResultSet clans = stmt.executeQuery("SELECT tag, owner FROM " + t("clans"));
             while (clans.next()) {
                 String tag = clans.getString("tag");
                 UUID owner = UUID.fromString(clans.getString("owner"));
                 clanOwnerCache.put(tag, owner);
             }
-            ResultSet members = stmt.executeQuery("SELECT player_uuid, clan_tag FROM members");
+            ResultSet members = stmt.executeQuery("SELECT player_uuid, clan_tag FROM " + t("members"));
             while (members.next()) {
                 UUID uuid = UUID.fromString(members.getString("player_uuid"));
                 String tag = members.getString("clan_tag");
                 playerClanCache.put(uuid, tag);
             }
-            ResultSet homes = stmt.executeQuery("SELECT clan_tag, world, x, y, z, yaw, pitch FROM clan_homes");
+            ResultSet homes = stmt.executeQuery("SELECT clan_tag, world, x, y, z, yaw, pitch FROM " + t("clan_homes"));
             while (homes.next()) {
                 String tag = homes.getString("clan_tag");
                 ClanHome home = new ClanHome(
@@ -110,23 +120,17 @@ public class DataBase {
                 );
                 homeCache.put(tag, home);
             }
-            ResultSet kills = stmt.executeQuery("SELECT clan_tag, kills FROM clan_kills");
+            ResultSet kills = stmt.executeQuery("SELECT clan_tag, kills FROM " + t("clan_kills"));
             while (kills.next()) {
-                String tag = kills.getString("clan_tag");
-                int count = kills.getInt("kills");
-                killsCache.put(tag, count);
+                killsCache.put(kills.getString("clan_tag"), kills.getInt("kills"));
             }
-            ResultSet balances = stmt.executeQuery("SELECT clan_tag, balance FROM clan_balance");
+            ResultSet balances = stmt.executeQuery("SELECT clan_tag, balance FROM " + t("clan_balance"));
             while (balances.next()) {
-                String tag = balances.getString("clan_tag");
-                double balance = balances.getDouble("balance");
-                balanceCache.put(tag, balance);
+                balanceCache.put(balances.getString("clan_tag"), balances.getDouble("balance"));
             }
-            ResultSet slots = stmt.executeQuery("SELECT clan_tag, unlocked_slots FROM clan_chest_slots");
+            ResultSet slots = stmt.executeQuery("SELECT clan_tag, unlocked_slots FROM " + t("clan_chest_slots"));
             while (slots.next()) {
-                String tag = slots.getString("clan_tag");
-                int unlocked = slots.getInt("unlocked_slots");
-                unlockedSlotsCache.put(tag, unlocked);
+                unlockedSlotsCache.put(slots.getString("clan_tag"), slots.getInt("unlocked_slots"));
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("Ошибка загрузки кэша: " + e.getMessage());
@@ -141,7 +145,8 @@ public class DataBase {
         unlockedSlotsCache.put(tag, slots);
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT OR REPLACE INTO clan_chest_slots (clan_tag, unlocked_slots) VALUES (?, ?)")) {
+                    "INSERT INTO " + t("clan_chest_slots") + " (clan_tag, unlocked_slots) VALUES (?, ?) " +
+                            "ON DUPLICATE KEY UPDATE unlocked_slots = VALUES(unlocked_slots)")) {
                 stmt.setString(1, tag);
                 stmt.setInt(2, slots);
                 stmt.execute();
@@ -158,13 +163,13 @@ public class DataBase {
         balanceCache.put(tag, 0.0);
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement clanStmt = connection.prepareStatement(
-                    "INSERT INTO clans (tag, owner) VALUES (?, ?)");
+                    "INSERT INTO " + t("clans") + " (tag, owner) VALUES (?, ?)");
                  PreparedStatement memberStmt = connection.prepareStatement(
-                    "INSERT INTO members (player_uuid, clan_tag) VALUES (?, ?)");
+                         "INSERT INTO " + t("members") + " (player_uuid, clan_tag) VALUES (?, ?)");
                  PreparedStatement killsStmt = connection.prepareStatement(
-                    "INSERT INTO clan_kills (clan_tag, kills) VALUES (?, 0)");
+                         "INSERT INTO " + t("clan_kills") + " (clan_tag, kills) VALUES (?, 0)");
                  PreparedStatement balanceStmt = connection.prepareStatement(
-                    "INSERT INTO clan_balance (clan_tag, balance) VALUES (?, 0)")) {
+                         "INSERT INTO " + t("clan_balance") + " (clan_tag, balance) VALUES (?, 0)")) {
                 clanStmt.setString(1, tag);
                 clanStmt.setString(2, owner.toString());
                 clanStmt.execute();
@@ -191,7 +196,7 @@ public class DataBase {
         balanceCache.remove(tag);
         unlockedSlotsCache.remove(tag);
         return CompletableFuture.runAsync(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM clans WHERE tag = ?")) {
+            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + t("clans") + " WHERE tag = ?")) {
                 stmt.setString(1, tag);
                 stmt.execute();
             } catch (SQLException e) {
@@ -204,7 +209,7 @@ public class DataBase {
         playerClanCache.put(player, tag);
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO members (player_uuid, clan_tag) VALUES (?, ?)")) {
+                    "INSERT INTO " + t("members") + " (player_uuid, clan_tag) VALUES (?, ?)")) {
                 stmt.setString(1, player.toString());
                 stmt.setString(2, tag);
                 stmt.execute();
@@ -218,7 +223,7 @@ public class DataBase {
         playerClanCache.remove(player);
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "DELETE FROM members WHERE player_uuid = ?")) {
+                    "DELETE FROM " + t("members") + " WHERE player_uuid = ?")) {
                 stmt.setString(1, player.toString());
                 stmt.execute();
             } catch (SQLException e) {
@@ -231,8 +236,8 @@ public class DataBase {
         killsCache.merge(tag, 1, Integer::sum);
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO clan_kills (clan_tag, kills) VALUES (?, 1) " +
-                    "ON CONFLICT(clan_tag) DO UPDATE SET kills = kills + 1")) {
+                    "INSERT INTO " + t("clan_kills") + " (clan_tag, kills) VALUES (?, 1) " +
+                            "ON DUPLICATE KEY UPDATE kills = kills + 1")) {
                 stmt.setString(1, tag);
                 stmt.execute();
             } catch (SQLException e) {
@@ -253,8 +258,8 @@ public class DataBase {
         balanceCache.merge(tag, amount, Double::sum);
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO clan_balance (clan_tag, balance) VALUES (?, ?) " +
-                    "ON CONFLICT(clan_tag) DO UPDATE SET balance = balance + ?")) {
+                    "INSERT INTO " + t("clan_balance") + " (clan_tag, balance) VALUES (?, ?) " +
+                            "ON DUPLICATE KEY UPDATE balance = balance + ?")) {
                 stmt.setString(1, tag);
                 stmt.setDouble(2, amount);
                 stmt.setDouble(3, amount);
@@ -269,8 +274,8 @@ public class DataBase {
         balanceCache.merge(tag, -amount, Double::sum);
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO clan_balance (clan_tag, balance) VALUES (?, ?) " +
-                    "ON CONFLICT(clan_tag) DO UPDATE SET balance = balance - ?")) {
+                    "INSERT INTO " + t("clan_balance") + " (clan_tag, balance) VALUES (?, ?) " +
+                            "ON DUPLICATE KEY UPDATE balance = balance - ?")) {
                 stmt.setString(1, tag);
                 stmt.setDouble(2, 0.0);
                 stmt.setDouble(3, amount);
@@ -285,7 +290,8 @@ public class DataBase {
         homeCache.put(tag, home);
         return CompletableFuture.runAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT OR REPLACE INTO clan_homes (clan_tag, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                    "INSERT INTO " + t("clan_homes") + " (clan_tag, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                            "ON DUPLICATE KEY UPDATE world=VALUES(world), x=VALUES(x), y=VALUES(y), z=VALUES(z), yaw=VALUES(yaw), pitch=VALUES(pitch)")) {
                 stmt.setString(1, tag);
                 stmt.setString(2, home.toLocation().getWorld().getName());
                 stmt.setDouble(3, home.toLocation().getX());
@@ -316,7 +322,7 @@ public class DataBase {
         chestToClanCache.put(inventory, tag);
         return CompletableFuture.supplyAsync(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT items FROM chest_items WHERE clan_tag = ?")) {
+                    "SELECT items FROM " + t("chest_items") + " WHERE clan_tag = ?")) {
                 stmt.setString(1, tag);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
@@ -337,7 +343,8 @@ public class DataBase {
         return CompletableFuture.runAsync(() -> {
             String serialized = serializeItems(inventory.getContents());
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT OR REPLACE INTO chest_items (clan_tag, items) VALUES (?, ?)")) {
+                    "INSERT INTO " + t("chest_items") + " (clan_tag, items) VALUES (?, ?) " +
+                            "ON DUPLICATE KEY UPDATE items = VALUES(items)")) {
                 stmt.setString(1, tag);
                 stmt.setString(2, serialized);
                 stmt.execute();

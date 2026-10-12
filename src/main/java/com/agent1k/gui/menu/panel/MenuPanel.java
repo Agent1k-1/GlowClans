@@ -1,4 +1,4 @@
-package com.agent1k.gui.menu;
+package com.agent1k.gui.menu.panel;
 
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;

@@ -2,8 +2,8 @@ package com.agent1k.listener;
 
 import com.agent1k.action.ActionType;
 import com.agent1k.click.ClickType;
-import com.agent1k.gui.menu.MenuHolder;
-import com.agent1k.gui.menu.MenuItem;
+import com.agent1k.gui.menu.holder.MenuHolder;
+import com.agent1k.gui.menu.panel.item.MenuItem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

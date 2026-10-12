@@ -1,4 +1,4 @@
-package com.agent1k.api;
+package com.agent1k.depend.softdepend;
 
 import com.agent1k.GlowClans;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -44,7 +44,9 @@ public class PapiAPI extends PlaceholderExpansion {
         Optional<String> tagOpt = plugin.getDataBase().getClanTag(player.getUniqueId());
         switch (params) {
             case "tag":
-                return tagOpt.orElse("");
+                return tagOpt.orElseGet(() -> plugin.getConfigs().isClanNoTagEnabled()
+                        ? plugin.getConfigs().getClanNoTagValue()
+                        : "");
             case "owner":
                 return tagOpt.flatMap(tag -> plugin.getDataBase().getClanOwner(tag))
                         .map(uuid -> {

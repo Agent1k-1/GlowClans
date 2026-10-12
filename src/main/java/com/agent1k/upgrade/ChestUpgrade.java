@@ -2,7 +2,7 @@ package com.agent1k.upgrade;
 
 import com.agent1k.action.ActionType;
 import com.agent1k.GlowClans;
-import com.agent1k.api.PointsAPI;
+import com.agent1k.depend.softdepend.PointsAPI;
 import com.agent1k.utils.HexUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

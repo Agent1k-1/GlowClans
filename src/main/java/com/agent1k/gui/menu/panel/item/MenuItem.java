@@ -1,4 +1,4 @@
-package com.agent1k.gui.menu;
+package com.agent1k.gui.menu.panel.item;
 
 import com.agent1k.click.ClickType;
 import org.bukkit.Material;

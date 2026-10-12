@@ -1,4 +1,4 @@
-package com.agent1k.api;
+package com.agent1k.depend;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;

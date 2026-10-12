@@ -2,7 +2,7 @@ package com.agent1k.commands.sub;
 
 import com.agent1k.action.ActionType;
 import com.agent1k.GlowClans;
-import com.agent1k.api.PapiAPI;
+import com.agent1k.depend.softdepend.PapiAPI;
 import com.agent1k.commands.subcommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

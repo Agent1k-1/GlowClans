@@ -1,4 +1,4 @@
-package com.agent1k.api;
+package com.agent1k.depend.softdepend;
 
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;

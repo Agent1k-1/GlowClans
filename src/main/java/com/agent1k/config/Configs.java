@@ -15,6 +15,8 @@ public class Configs {
     private double maxWithdraw;
     private boolean clanTagLimitEnabled;
     private int clanTagMaxLength;
+    private boolean clanNoTagEnabled;
+    private String clanNoTagValue;
     private int chestSize;
     private String chestInventoryName;
     private UpgradeType upgradeType;
@@ -40,6 +42,8 @@ public class Configs {
         maxWithdraw = plugin.getConfig().getDouble("settings.max-withdraw", 25000.0);
         clanTagLimitEnabled = plugin.getConfig().getBoolean("settings.clan-tag.enabled", false);
         clanTagMaxLength = plugin.getConfig().getInt("settings.clan-tag.tag", 15);
+        clanNoTagEnabled = plugin.getConfig().getBoolean("settings.clan-no-tag.enabled", false);
+        clanNoTagValue = plugin.getConfig().getString("settings.clan-no-tag.tag", "");
         chestSize = plugin.getConfig().getInt("clan-chest.size");
         chestInventoryName = HexUtils.colorize(plugin.getConfig().getString("clan-chest.inventory-name"));
         upgradeType = UpgradeType.fromString(plugin.getConfig().getString("upgrade-settings.type-upgrade.type"));
@@ -58,6 +62,8 @@ public class Configs {
     public double getMaxWithdraw() { return maxWithdraw; }
     public boolean isClanTagLimitEnabled() { return clanTagLimitEnabled; }
     public int getClanTagMaxLength() { return clanTagMaxLength; }
+    public boolean isClanNoTagEnabled() { return clanNoTagEnabled; }
+    public @NotNull String getClanNoTagValue() { return clanNoTagValue; }
     public int getChestSize() { return chestSize; }
     public @NotNull String getChestInventoryName() { return chestInventoryName; }
     public @NotNull UpgradeType getUpgradeType() { return upgradeType; }

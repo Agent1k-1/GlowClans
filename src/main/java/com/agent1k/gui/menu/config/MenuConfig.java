@@ -1,7 +1,9 @@
-package com.agent1k.gui.menu;
+package com.agent1k.gui.menu.config;
 
 import com.agent1k.GlowClans;
 import com.agent1k.click.ClickType;
+import com.agent1k.gui.menu.panel.MenuPanel;
+import com.agent1k.gui.menu.panel.item.MenuItem;
 import com.agent1k.utils.HexUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;

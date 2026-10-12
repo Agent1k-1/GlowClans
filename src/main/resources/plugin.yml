@@ -6,6 +6,7 @@ depend: [ Vault ]
 softdepend: [ PlaceholderAPI, PlayerPoints ]
 libraries:
   - org.xerial:sqlite-jdbc:3.44.0.0
+  - com.mysql:mysql-connector-j:8.3.0
 commands:
   clan:
 permissions:

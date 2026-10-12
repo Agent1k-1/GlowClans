@@ -1,17 +1,18 @@
 package com.agent1k;
 
-import com.agent1k.api.PapiAPI;
-import com.agent1k.api.PointsAPI;
-import com.agent1k.api.VaultAPI;
+import com.agent1k.depend.softdepend.PapiAPI;
+import com.agent1k.depend.softdepend.PointsAPI;
+import com.agent1k.depend.VaultAPI;
 import com.agent1k.commands.ClanCommand;
 import com.agent1k.commands.sub.*;
 import com.agent1k.commands.tab.ClanCompleter;
 import com.agent1k.config.Configs;
 import com.agent1k.config.BlockNameConfig;
+import com.agent1k.config.DbConfig;
 import com.agent1k.config.MessagesConfig;
-import com.agent1k.data.DataBase;
+import com.agent1k.data.SQLite;
 import com.agent1k.gui.ClanGUI;
-import com.agent1k.gui.menu.MenuConfig;
+import com.agent1k.gui.menu.config.MenuConfig;
 import com.agent1k.gui.menu.MenuDirectory;
 import com.agent1k.listener.ChestListener;
 import com.agent1k.listener.KillListener;
@@ -28,7 +29,8 @@ public final class GlowClans extends JavaPlugin {
     private Configs configs;
     private MessagesConfig messagesConfig;
     private BlockNameConfig blockNameConfig;
-    private DataBase dataBase;
+    private DbConfig dbConfig;
+    private SQLite sqLite;
     private VaultAPI vaultAPI;
     private PointsAPI pointsAPI;
     private ChestUpgrade chestUpgrade;
@@ -49,7 +51,8 @@ public final class GlowClans extends JavaPlugin {
         configs = new Configs(this);
         messagesConfig = new MessagesConfig(this);
         blockNameConfig = new BlockNameConfig(this);
-        dataBase = new DataBase(this);
+        dbConfig = new DbConfig(this);
+        sqLite = new SQLite(this);
         vaultAPI = new VaultAPI();
         chestUpgrade = new ChestUpgrade(this);
         menuDirectory = new MenuDirectory(this);
@@ -115,13 +118,14 @@ public final class GlowClans extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "Автор: " + ChatColor.AQUA + "Agent1k");
         Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "Telegram: " + ChatColor.LIGHT_PURPLE + "t.me/monstexd");
         Bukkit.getConsoleSender().sendMessage("");
-        if (dataBase != null) dataBase.close();
+        if (sqLite != null) sqLite.close();
     }
 
     public @NotNull Configs getConfigs() { return configs; }
     public @NotNull MessagesConfig getMessages() { return messagesConfig; }
     public @NotNull BlockNameConfig getBlockNameConfig() { return blockNameConfig; }
-    public @NotNull DataBase getDataBase() { return dataBase; }
+    public @NotNull DbConfig getDbConfig() { return dbConfig; }
+    public @NotNull SQLite getDataBase() { return sqLite; }
     public @NotNull VaultAPI getVaultAPI() { return vaultAPI; }
     public @Nullable PointsAPI getPointsAPI() { return pointsAPI; }
     public @NotNull ChestUpgrade getChestUpgrade() { return chestUpgrade; }
@@ -133,6 +137,7 @@ public final class GlowClans extends JavaPlugin {
         configs.load();
         messagesConfig.load();
         blockNameConfig.load();
+        dbConfig.load();
         chestUpgrade = new ChestUpgrade(this);
         menuConfig.load();
     }

@@ -1,10 +1,10 @@
 package com.agent1k.gui;
 
 import com.agent1k.GlowClans;
-import com.agent1k.gui.menu.MenuConfig;
-import com.agent1k.gui.menu.MenuHolder;
-import com.agent1k.gui.menu.MenuItem;
-import com.agent1k.gui.menu.MenuPanel;
+import com.agent1k.gui.menu.config.MenuConfig;
+import com.agent1k.gui.menu.holder.MenuHolder;
+import com.agent1k.gui.menu.panel.item.MenuItem;
+import com.agent1k.gui.menu.panel.MenuPanel;
 import com.agent1k.utils.HexUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
